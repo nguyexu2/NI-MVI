@@ -1,25 +1,21 @@
 #pragma once 
 #include "include.cpp"
 
+// each value is in range {-1, 1};
+// position[0] is reserved, will not used
+// to see if variable x is set on true or false, use assigment[abs(x)];
+using assignments = vector<int>;
 
 using variable = int;
-
-struct assignments
-{
-	// each value is in range {-1, 1};
-	// position[0] is reserved, will not used
-	// to see if variable x is set on true or false, use assigment[abs(x)];
-	vector<int> assigment;
-
-	int getAssigment(const variable &x) const { return assigment[abs(x)]; }
-	bool evaluate(const variable &x) const { return x * getAssigment(x); }
-};
 
 // each literal has a label, negative value means the same variable is in negation 
 struct literal
 {
 	variable var;
-	bool isSat(const assignments &values) const { return values.evaluate(var); }
+	bool isSat(const assignments &values) const
+	{
+		return var * values[abs(var)];
+	}
 };
 
 // a clause is a disjunction of literals
@@ -44,5 +40,16 @@ struct formula
 			if(!clause.isSat(values)) return false;
 		return true;
 	}
-	vector<clause> clauses;	
+
+	int solvedClauses(const assignments & values) const
+	{
+		int ret = 0;
+		for(const auto & clause : clauses)
+			if(clause.isSat(values)) ret++;
+		return ret;
+	}
+	vector<clause> clauses;
+	int variables;
+
+	formula(const int varCount) : variables(varCount){}
 };

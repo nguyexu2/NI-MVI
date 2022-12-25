@@ -1,0 +1,12 @@
+build/
+local/
+*.slo
+*.lo
+*.o
+*.obj
+*.gch
+*.pch
+*.exe
+*.out
+*.app
+.vscode
