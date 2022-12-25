@@ -14,7 +14,7 @@ struct literal
 	variable var;
 	bool isSat(const assignments &values) const
 	{
-		return var * values[abs(var)];
+		return var * values[abs(var)] > 0;
 	}
 };
 
