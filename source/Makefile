@@ -6,7 +6,7 @@ PROGRAM_NAME = main
 
 #important, use . if for current directory, dont leave empty
 SOURCE = .
-BUILD = .
+BUILD = build
 
 all: $(PROGRAM_NAME)
 
