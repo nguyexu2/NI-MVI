@@ -1,6 +1,7 @@
 build/
 local/
 data/
+main
 *.slo
 *.lo
 *.o
