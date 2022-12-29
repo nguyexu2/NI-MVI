@@ -55,6 +55,7 @@ formula load(const string & location)
 
 void print(const formula & instance, const assignments & solution)
 {
+	cout << "solved " << instance.solvedClauses(solution) << "/" << instance.clauses.size() << " clauses" << endl;
 	cout << (instance.isSat(solution) ? "solved" : "not solved") << endl;
 	
 	FOR(i, 1, solution.size())
