@@ -21,20 +21,17 @@ vector<assignments> tournament(const formula &instance, const vector<assignments
 //------------------------------
 // operators
 
-assignments crossover(const assignments & a, const assignments & b, int splits)
+void crossover(assignments & a, assignments & b, int splits = 1)
 {
-	assignments ret = a;
 	set<int> splitPos;
 	FOR(i, 0, splits) splitPos.insert(getrandInt(0, a.size()));
 
 	vector<int> vSplitPos(splitPos.begin(), splitPos.end());
-	FOR(i, 0, vSplitPos.size() - 1)
+	for(int i = 0; i < (int)vSplitPos.size() -1; i+=2) //on even swap, on odd keep as it is
 	{
-		auto s = vSplitPos[i], e = vSplitPos[i+1];
-		FOR(j, s, e) ret[j] = i % 2? a[j] : b[j];
+		FOR(idx, vSplitPos[i], vSplitPos[i+1])
+			swap(a[idx], b[idx]);
 	}
-	
-	return ret;
 }
 
 assignments mutation(const assignments & config, double changeRate)
