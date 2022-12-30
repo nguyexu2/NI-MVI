@@ -4,23 +4,25 @@
 
 struct config
 {
-	string location;
+	string instanceLocation;
+	string GAParamLocation = "";
 };
 
 config parseParams(int argc, char ** argv)
 {
 	if(argc != 2)
 	{
-		cerr << "./a.out [file location]" << endl;
+		cerr << "./a.out [file location] [optional config file]" << endl;
 		exit(1);
 	}
 
 	config ret;
-	ret.location = string(argv[1]);
+	ret.instanceLocation = string(argv[1]);
+	ret.GAParamLocation = argc >= 3? string(argv[2]) : "";
 	return ret;
 }
 
-formula load(const string & location)
+formula loadInstance(const string & location)
 {
 	ifstream is(location);
 	auto get_uc_line = [](ifstream & is) {
@@ -53,8 +55,25 @@ formula load(const string & location)
 	return instance;
 }
 
-void print(const formula & instance, const assignments & solution)
+GAConfig loadConfig(const string & location)
 {
+	GAConfig ret;
+	if(location == "") return ret; // default config
+
+	ifstream in(location);
+
+	if (!(in >> ret.populationSize >> ret.restarts >> ret.maxIterations >> ret.elitismRate >> ret.mutationRate))
+	{
+		cerr << "config file is not valid";
+		exit(1);
+	}
+
+	return ret;
+}
+
+void print(const formula & instance, const assignments & solution, double time)
+{
+	cout << "took " << time << "ms" << endl;
 	cout << "solved " << instance.solvedClauses(solution) << "/" << instance.clauses.size() << " clauses" << endl;
 	cout << (instance.isSat(solution) ? "solved" : "not solved") << endl;
 	

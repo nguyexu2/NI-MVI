@@ -53,3 +53,14 @@ struct formula
 
 	formula(const int varCount) : variables(varCount){}
 };
+
+struct GAConfig
+{
+	int populationSize = 100;
+	
+	int restarts = 1;
+	int maxIterations = 5000;
+
+	double elitismRate = 0.7;
+	double mutationRate = 0.25;
+};

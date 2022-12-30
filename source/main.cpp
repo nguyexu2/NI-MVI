@@ -8,7 +8,13 @@ int main(int argc, char ** argv)
 {
 	initRNG();
 	auto conf = parseParams(argc, argv);
-	auto instance = load(conf.location); 
-	auto solution = solve(instance);
-	print(instance, solution);
+	auto instance = loadInstance(conf.instanceLocation);
+	auto GAParams = loadConfig(conf.GAParamLocation);
+
+	TIMER t;
+	t.start(true);
+	auto solution = solve(instance, GAParams);
+	t.stop(false);
+	
+	print(instance, solution, t.get());
 }

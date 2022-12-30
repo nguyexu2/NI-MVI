@@ -3,19 +3,11 @@
 #include "structures.h"
 
 //------------------------------
-//selection of population
-vector<assignments> roulette(const formula &instance, const vector<assignments> &population,
-							 double elitismRate)
+//fitness
+
+int getFitness(const formula & instance, const assignments & config)
 {
-	vector<assignments> ret;
-
-	return ret;
-}
-
-vector<assignments> tournament(const formula &instance, const vector<assignments> &population,
-							   double probability, double elitismRate)
-{
-
+	return instance.solvedClauses(config);
 }
 
 //------------------------------
@@ -46,8 +38,38 @@ void fillThePopulation(const formula &instance, vector<assignments> &population,
 
 		//take the better of 2 children
 		population.push_back(instance.solvedClauses(ch1) > instance.solvedClauses(ch2) ? ch1 : ch2);
-
 	}
+}
+
+//------------------------------
+
+//selection of population
+vector<assignments> roulette(const formula &instance, const vector<assignments> &population,
+							 double elitismRate)
+{
+	vector<assignments> ret;
+
+	vector<pair<int, int>> sortIdx;
+	FOR(i, 0, population.size())
+		sortIdx.push_back({getFitness(instance, population[i]), i});
+
+	//sort by number of solved clauses
+	sort(sortIdx.begin(), sortIdx.end(), std::greater<pair<int, int>>{});
+
+	//select the best only
+	FOR(i, 0, elitismRate*population.size())
+		ret.push_back(population[sortIdx[i].second]);
+
+	int goalSize = population.size();
+	fillThePopulation(instance, ret, goalSize);
+
+	return ret;
+}
+
+vector<assignments> tournament(const formula &instance, const vector<assignments> &population,
+							   double probability, double elitismRate)
+{
+
 }
 
 //------------------------------
@@ -64,10 +86,13 @@ assignments mutation(const assignments & config, double changeRate)
 	return ret;
 }
 
-//------------------------------
-//fitness
-
-int getFitness(const formula & instance, const assignments & config)
+void mutatePopulation(vector<assignments> & population, double changeRate)
 {
-	return instance.solvedClauses(config);
+	int changedIndividuals = population.size()/4; //todo:
+
+	FOR(i, 0, changedIndividuals)
+	{
+		int idx = getrandInt(0, population.size());
+		population[idx] = mutation(population[idx], changeRate); //set change rate
+	}
 }
