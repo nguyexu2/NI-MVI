@@ -19,6 +19,6 @@ void initRNG()
 
 int getrandInt(int lb, int ub)
 {
-	std::uniform_int_distribution<std::mt19937::result_type> generator(lb , ub);
+	std::uniform_int_distribution<std::mt19937::result_type> generator(lb , ub-1);
 	return generator(rng);
 }
