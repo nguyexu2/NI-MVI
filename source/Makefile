@@ -14,7 +14,7 @@ run: $(PROGRAM_NAME)
 	./$< ../data/pret60_25.cnf
 
 debug: $(PROGRAM_NAME)
-	valgrind --leak-check=full ./$<
+	valgrind --leak-check=full ./$< ../data/pret60_25.cnf
 
 $(PROGRAM_NAME): $(BUILD)/$(PROGRAM_NAME).o
 	$(CXX) -o $@ $^ $(LDFLAGS)
