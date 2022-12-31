@@ -27,6 +27,11 @@ assignments solve1Iteration(const formula &instance, const GAConfig & conf)
 {
 	vector<assignments> population;
 	FOR(i, 0, conf.populationSize) population.push_back(randomAssigment(instance.variables));
+	//creates sorted population by number of solved clauses to get the best solution
+	sort(population.begin(), population.end(), [&](const auto &a, const auto &b)
+		{ return instance.solvedClauses(a) > instance.solvedClauses(b); });
+
+	assignments best = population.front();
 		 
 	FOR(it, 0, conf.maxIterations)
 	{
@@ -41,13 +46,17 @@ assignments solve1Iteration(const formula &instance, const GAConfig & conf)
 
 		// mutations
 		mutatePopulation(population, conf);
+		
+		//creates sorted population by number of solved clauses to get the best solution
+		sort(population.begin(), population.end(), [&](const auto &a, const auto &b)
+			{ return instance.solvedClauses(a) > instance.solvedClauses(b); });
+
+		if(instance.solvedClauses(population.front()) > instance.solvedClauses(best))
+			best = population.front();
+		deb(instance.solvedClauses(best));
 	}
 
-	//creates sorted population by number of solved clauses to get the best solution
-	sort(population.begin(), population.end(), [&](const auto &a, const auto &b)
-		 { return instance.solvedClauses(a) > instance.solvedClauses(b); });
-
-	return population.front();
+	return best;
 }
 
 assignments solve(const formula & instance, const GAConfig & conf)
