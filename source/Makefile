@@ -11,7 +11,7 @@ BUILD = build
 all: $(PROGRAM_NAME)
 
 run: $(PROGRAM_NAME)
-	./$< ../data/pret60_25.cnf
+	./$< ../data/pret60_25.cnf ../config/best.conf
 
 debug: $(PROGRAM_NAME)
 	valgrind --leak-check=full ./$< ../data/pret60_25.cnf

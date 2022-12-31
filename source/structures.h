@@ -56,7 +56,7 @@ struct formula
 
 struct GAConfig
 {
-	int populationSize = 100;
+	int populationSize = 500;
 
 	int restarts = 1;
 	int maxIterations = 5000;
@@ -64,4 +64,5 @@ struct GAConfig
 	double elitismRate = 0.7;
 	double mutatedIndividuals = 0.25;
 	double chromosomeChangeRate = 0.01;
+	int splits = 1;
 };

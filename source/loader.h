@@ -11,7 +11,7 @@ struct config
 
 config parseParams(int argc, char ** argv)
 {
-	if(argc != 2)
+	if(argc < 2)
 	{
 		cerr << "./a.out [file location] [optional config file]" << endl;
 		exit(1);
@@ -68,10 +68,35 @@ GAConfig loadConfig(const string & location)
 
 	ifstream in(location);
 
-	if (!(in >> ret.populationSize >> ret.restarts >> ret.maxIterations >> ret.elitismRate >> ret.mutationRate))
+	while(!in.eof())
 	{
-		cerr << "config file is not valid";
-		exit(1);
+		string field;
+		double val;
+		if(! (in >> field >> val))
+		{
+			deb(field)
+			cerr << "config file is not valid" << endl;
+			exit(1);
+		}
+
+		if(field == "populationSize")
+			ret.populationSize = val;
+		else if(field == "restarts")
+			ret.restarts = val;
+		else if(field == "maxIterations")
+			ret.maxIterations = val;
+		else if(field == "elitismRate")
+			ret.elitismRate = val;
+		else if(field == "mutatedIndividuals")
+			ret.mutatedIndividuals = val;
+		else if(field == "chromosomeChangeRate")
+			ret.chromosomeChangeRate = val;
+		else if(field == "splits")
+			ret.splits = val;
+		else{
+			cerr << "config file is not valid, got a weird field";
+			exit(1);
+		}
 	}
 
 	return ret;
