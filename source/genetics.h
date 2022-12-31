@@ -5,9 +5,9 @@
 //------------------------------
 //fitness
 
-int getFitness(const formula & instance, const assignments & config)
+int getFitness(const formula & instance, const assignments & solution)
 {
-	return instance.solvedClauses(config);
+	return instance.solvedClauses(solution);
 }
 
 //------------------------------
@@ -27,14 +27,14 @@ pair<assignments, assignments> crossover(assignments a, assignments b, int split
 	return {a, b};
 }
 
-void fillThePopulation(const formula &instance, vector<assignments> &population, int finalPopulationSize)
+void fillThePopulation(const formula &instance, vector<assignments> &population, const GAConfig & conf)
 {
-	int oldCnt = population.size(), cnt = finalPopulationSize - oldCnt;
+	int oldCnt = population.size(), cnt = conf.populationSize - oldCnt;
 	FOR(i, 0, cnt)
 	{
 		int first, second;
 		do {first = getrandInt(0, oldCnt), second = getrandInt(0, oldCnt);} while(first == second);
-		auto [ch1, ch2] = crossover(population[first], population[second]);
+		auto [ch1, ch2] = crossover(population[first], population[second]); //todo
 
 		//take the better of 2 children
 		population.push_back(instance.solvedClauses(ch1) > instance.solvedClauses(ch2) ? ch1 : ch2);
@@ -45,7 +45,7 @@ void fillThePopulation(const formula &instance, vector<assignments> &population,
 
 //selection of population
 vector<assignments> roulette(const formula &instance, const vector<assignments> &population,
-							 double elitismRate)
+							 const GAConfig & conf)
 {
 	vector<assignments> ret;
 
@@ -56,25 +56,34 @@ vector<assignments> roulette(const formula &instance, const vector<assignments> 
 	//sort by number of solved clauses
 	sort(sortIdx.begin(), sortIdx.end(), std::greater<pair<int, int>>{});
 
-	//select the best only
-	FOR(i, 0, elitismRate*population.size())
-		ret.push_back(population[sortIdx[i].second]);
+	vector<int> wheel;
+	for(auto [score, idx] : sortIdx) wheel.push_back(score);
+	//accumulated Sum
+	FOR(i, 1, wheel.size()) wheel[i] += wheel[i-1];
 
-	int goalSize = population.size();
-	fillThePopulation(instance, ret, goalSize);
+	//select the with bias towards the better
+	FOR(i, 0, conf.elitismRate*population.size())
+	{
+		int score = getrandInt(0, wheel.back());
+		auto find = lower_bound(wheel.begin(), wheel.end(), score);
+		int idx = find - wheel.begin();
+		ret.push_back(population[sortIdx[idx].second]);
+	}
+
+	fillThePopulation(instance, ret, conf);
 
 	return ret;
 }
 
-vector<assignments> tournament(const formula &instance, const vector<assignments> &population,
-							   double probability, double elitismRate)
-{
+// vector<assignments> tournament(const formula &instance, const vector<assignments> &population,
+// 							   double probability, double elitismRate)
+// {
 
-}
+// }
 
 //------------------------------
 
-assignments mutation(const assignments & config, double changeRate)
+assignments mutation(const assignments & config, const GAConfig & conf)
 {
 	assignments ret = config;
 	int cnt = 1; //todo: generate
@@ -86,13 +95,13 @@ assignments mutation(const assignments & config, double changeRate)
 	return ret;
 }
 
-void mutatePopulation(vector<assignments> & population, double changeRate)
+void mutatePopulation(vector<assignments> & population, const GAConfig & conf)
 {
 	int changedIndividuals = population.size()/4; //todo:
 
 	FOR(i, 0, changedIndividuals)
 	{
 		int idx = getrandInt(0, population.size());
-		population[idx] = mutation(population[idx], changeRate); //set change rate
+		population[idx] = mutation(population[idx], conf); //set change rate
 	}
 }
