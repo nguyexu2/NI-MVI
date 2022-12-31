@@ -23,28 +23,24 @@ bool existsSolution(const formula & instance, const vector<assignments> & popula
 	return false;
 }
 
-assignments solve(const formula &instance,
-				  const int populationSize,
-				  const double elitismRate,
-				  const double mutationRate,
-				  const int maxIterations)
+assignments solve1Iteration(const formula &instance, const GAConfig & conf)
 {
 	vector<assignments> population;
-	FOR(i, 0, populationSize) population.push_back(randomAssigment(instance.variables));
+	FOR(i, 0, conf.populationSize) population.push_back(randomAssigment(instance.variables));
 		 
-	FOR(it, 0, maxIterations)
+	FOR(it, 0, conf.maxIterations)
 	{
 		if(existsSolution(instance, population))
 			break;
 
 		// selection
-		population = roulette(instance, population, elitismRate);
+		population = roulette(instance, population, conf);
 
 		// mutations
-		mutatePopulation(population, mutationRate);
+		mutatePopulation(population, conf);
 	}
 
-		//creates sorted population by number of solved clauses
+	//creates sorted population by number of solved clauses to get the best solution
 	sort(population.begin(), population.end(), [&](const auto &a, const auto &b)
 		 { return instance.solvedClauses(a) > instance.solvedClauses(b); });
 
@@ -55,8 +51,7 @@ assignments solve(const formula & instance, const GAConfig & conf)
 {
 	vector<assignments> solutions;
 	FOR(i, 0, conf.restarts +1)
-		solutions.push_back(solve(instance,
-		conf.populationSize, conf.elitismRate, conf.mutationRate, conf.maxIterations));
+		solutions.push_back(solve1Iteration(instance, conf));
 	
 	sort(solutions.begin(), solutions.end(), [&](const auto &a, const auto &b)
 		 { return instance.solvedClauses(a) > instance.solvedClauses(b); });
