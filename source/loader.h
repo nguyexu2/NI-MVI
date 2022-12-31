@@ -6,6 +6,7 @@ struct config
 {
 	string instanceLocation;
 	string GAParamLocation = "";
+	bool verbose = false;
 };
 
 config parseParams(int argc, char ** argv)
@@ -19,6 +20,11 @@ config parseParams(int argc, char ** argv)
 	config ret;
 	ret.instanceLocation = string(argv[1]);
 	ret.GAParamLocation = argc >= 3? string(argv[2]) : "";
+	if(argc >= 4)
+	{
+		stringstream ss(argv[3]);
+		ss >> ret.verbose;
+	}
 	return ret;
 }
 
@@ -71,15 +77,25 @@ GAConfig loadConfig(const string & location)
 	return ret;
 }
 
-void print(const formula & instance, const assignments & solution, double time)
+void print(const formula & instance, const assignments & solution, double time, bool verbose = false)
 {
-	cout << "took " << time << "ms" << endl;
-	cout << "solved " << instance.solvedClauses(solution) << "/" << instance.clauses.size() << " clauses" << endl;
-	cout << (instance.isSat(solution) ? "solved" : "not solved") << endl;
-	
-	FOR(i, 1, solution.size())
+	if(verbose)
 	{
-		cout << solution[i] << " ";
+		cout << "took " << time << "ms" << endl;
+		cout << "solved " << instance.solvedClauses(solution) << "/" << instance.clauses.size() << " clauses" << endl;
+		cout << (instance.isSat(solution) ? "solved" : "not solved") << endl;
+		
+		FOR(i, 1, solution.size())
+		{
+			cout << solution[i] << " ";
+		}
+		cout << endl;
 	}
-	cout << endl;
+	else
+	{
+		cout << instance.isSat(solution);
+		cout << "," << instance.solvedClauses(solution);
+		cout << "," << instance.clauses.size();
+		cout << "," << time << endl;
+	}
 }

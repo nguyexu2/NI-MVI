@@ -16,5 +16,5 @@ int main(int argc, char ** argv)
 	auto solution = solve(instance, GAParams);
 	t.stop(false);
 	
-	print(instance, solution, t.get());
+	print(instance, solution, t.get(), conf.verbose);
 }

@@ -57,7 +57,7 @@ struct formula
 struct GAConfig
 {
 	int populationSize = 100;
-	
+
 	int restarts = 1;
 	int maxIterations = 5000;
 
