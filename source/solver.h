@@ -29,7 +29,7 @@ assignments solve1Iteration(const formula &instance, const GAConfig & conf)
 	FOR(i, 0, conf.populationSize) population.push_back(randomAssigment(instance.variables));
 	//creates sorted population by number of solved clauses to get the best solution
 	sort(population.begin(), population.end(), [&](const auto &a, const auto &b)
-		{ return instance.solvedClauses(a) > instance.solvedClauses(b); });
+		{ return getFitness(instance, a) > getFitness(instance, b); });
 
 	assignments best = population.front();
 		 
@@ -49,11 +49,14 @@ assignments solve1Iteration(const formula &instance, const GAConfig & conf)
 		
 		//creates sorted population by number of solved clauses to get the best solution
 		sort(population.begin(), population.end(), [&](const auto &a, const auto &b)
-			{ return instance.solvedClauses(a) > instance.solvedClauses(b); });
+			{ return getFitness(instance, a) > getFitness(instance, b); });
 
 		if(instance.solvedClauses(population.front()) > instance.solvedClauses(best))
+		{
 			best = population.front();
-		deb(instance.solvedClauses(best));
+			deb(it);
+			deb(instance.solvedClauses(best));
+		}
 	}
 
 	return best;
