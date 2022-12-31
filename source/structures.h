@@ -62,5 +62,6 @@ struct GAConfig
 	int maxIterations = 5000;
 
 	double elitismRate = 0.7;
-	double mutationRate = 0.25;
+	double mutatedIndividuals = 0.25;
+	double chromosomeChangeRate = 0.01;
 };

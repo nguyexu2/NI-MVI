@@ -36,6 +36,9 @@ assignments solve1Iteration(const formula &instance, const GAConfig & conf)
 		// selection
 		population = roulette(instance, population, conf);
 
+		// crossover
+		fillThePopulation(instance, population, conf);
+
 		// mutations
 		mutatePopulation(population, conf);
 	}

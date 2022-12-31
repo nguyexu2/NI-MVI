@@ -49,17 +49,11 @@ vector<assignments> roulette(const formula &instance, const vector<assignments> 
 {
 	vector<assignments> ret;
 
-	vector<pair<int, int>> sortIdx;
-	FOR(i, 0, population.size())
-		sortIdx.push_back({getFitness(instance, population[i]), i});
-
-	//sort by number of solved clauses
-	sort(sortIdx.begin(), sortIdx.end(), std::greater<pair<int, int>>{});
-
 	vector<int> wheel;
-	for(auto [score, idx] : sortIdx) wheel.push_back(score);
-	//accumulated Sum
-	FOR(i, 1, wheel.size()) wheel[i] += wheel[i-1];
+	//cumulated sum to find where a number is on the wheel using binary search
+	wheel.push_back(getFitness(instance, population.front()));
+	FOR(i, 1, population.size())
+		wheel.push_back(getFitness(instance, population[i]) + wheel.back());
 
 	//select the with bias towards the better
 	FOR(i, 0, conf.elitismRate*population.size())
@@ -67,10 +61,8 @@ vector<assignments> roulette(const formula &instance, const vector<assignments> 
 		int score = getrandInt(0, wheel.back());
 		auto find = lower_bound(wheel.begin(), wheel.end(), score);
 		int idx = find - wheel.begin();
-		ret.push_back(population[sortIdx[idx].second]);
+		ret.push_back(population[idx]);
 	}
-
-	fillThePopulation(instance, ret, conf);
 
 	return ret;
 }
@@ -85,23 +77,24 @@ vector<assignments> roulette(const formula &instance, const vector<assignments> 
 
 assignments mutation(const assignments & config, const GAConfig & conf)
 {
-	assignments ret = config;
-	int cnt = 1; //todo: generate
+	//at least 1 flip
+	const int cnt = max(1, (int)(conf.chromosomeChangeRate * config.size()));
 
 	set<int> flipPos;
 	FOR(i, 0, cnt) flipPos.insert(getrandInt(1, config.size()));
 
+	assignments ret = config;
 	for(auto pos : flipPos) ret[pos] = -ret[pos];
 	return ret;
 }
 
 void mutatePopulation(vector<assignments> & population, const GAConfig & conf)
 {
-	int changedIndividuals = population.size()/4; //todo:
+	int changedIndividuals = population.size() * conf.mutatedIndividuals;
 
 	FOR(i, 0, changedIndividuals)
 	{
 		int idx = getrandInt(0, population.size());
-		population[idx] = mutation(population[idx], conf); //set change rate
+		population[idx] = mutation(population[idx], conf);
 	}
 }
