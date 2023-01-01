@@ -23,6 +23,22 @@ bool existsSolution(const formula & instance, const vector<assignments> & popula
 	return false;
 }
 
+assignments getBestAssignment(const formula & instance, const vector<assignments> & population)
+{
+	assignments ret = population[0];
+	auto score = getFitness(instance, ret);
+	FOR(i, 1, population.size())
+	{
+		auto nScore = getFitness(instance, population[i]);
+		if(nScore > score)
+		{
+			score = nScore;
+			ret = population[i];
+		}
+	}
+	return ret;
+}
+
 assignments solve1Iteration(const formula &instance, const GAConfig & conf)
 {
 	vector<assignments> population;
@@ -46,16 +62,14 @@ assignments solve1Iteration(const formula &instance, const GAConfig & conf)
 
 		// mutations
 		mutatePopulation(population, conf);
-		
-		//creates sorted population by number of solved clauses to get the best solution
-		sort(population.begin(), population.end(), [&](const auto &a, const auto &b)
-			{ return getFitness(instance, a) > getFitness(instance, b); });
 
-		if(instance.solvedClauses(population.front()) > instance.solvedClauses(best))
+		auto newBest = getBestAssignment(instance, population);
+
+		if(getFitness(instance, newBest) > getFitness(instance, best))
 		{
-			best = population.front();
-			deb(it);
-			deb(instance.solvedClauses(best));
+			best = newBest;
+			// deb(it);
+			deb(getFitness(instance, best));
 		}
 	}
 
@@ -67,9 +81,6 @@ assignments solve(const formula & instance, const GAConfig & conf)
 	vector<assignments> solutions;
 	FOR(i, 0, conf.restarts +1)
 		solutions.push_back(solve1Iteration(instance, conf));
-	
-	sort(solutions.begin(), solutions.end(), [&](const auto &a, const auto &b)
-		 { return instance.solvedClauses(a) > instance.solvedClauses(b); });
 
-	return solutions.front();
+	return getBestAssignment(instance, solutions);
 }
