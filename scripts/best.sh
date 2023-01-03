@@ -4,7 +4,7 @@
 type=best
 mkdir -p $type
 config=../config/best.conf
-FILE="${type}/it$(basename -- $config)".csv
+FILE="${type}"/train.csv
 
 echo config $FILE
 

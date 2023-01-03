@@ -34,6 +34,7 @@ assignments getBestAssignment(const formula & instance, const vector<assignments
 		{
 			score = nScore;
 			ret = population[i];
+			if(instance.isSat(ret)) return ret;
 		}
 	}
 	return ret;
@@ -80,7 +81,11 @@ assignments solve(const formula & instance, const GAConfig & conf)
 {
 	vector<assignments> solutions;
 	FOR(i, 0, conf.restarts +1)
-		solutions.push_back(solve1Iteration(instance, conf));
+	{
+		auto res = solve1Iteration(instance, conf);
+		if(instance.isSat(res)) return res;
+		solutions.push_back(res);
+	}
 
 	return getBestAssignment(instance, solutions);
 }
