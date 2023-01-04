@@ -11,10 +11,10 @@ BUILD = build
 all: $(PROGRAM_NAME)
 
 run: $(PROGRAM_NAME)
-	./$< ../data/uf50-218/uf50-0177.cnf ../config/best.conf
+	./$< ../data/train/uf200-860/uf200-088.cnf ../config/best.conf
 
 debug: $(PROGRAM_NAME)
-	valgrind --leak-check=full ./$< ../data/uf50-218/uf50-0177.cnf ../config/best.conf
+	valgrind --leak-check=full ./$< ../data/train/uf200-860/uf200-088.cnf ../config/best.conf
 
 $(PROGRAM_NAME): $(BUILD)/$(PROGRAM_NAME).o
 	$(CXX) -o $@ $^ $(LDFLAGS)

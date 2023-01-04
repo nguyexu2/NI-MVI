@@ -40,17 +40,26 @@ assignments getBestAssignment(const formula & instance, const vector<assignments
 	return ret;
 }
 
+double getAverageFitness(const formula & instance, const vector<assignments> & population)
+{
+	double sum = 0;
+	for(const auto & x : population) sum += getFitness(instance, x);
+	return sum / population.size();
+}
+
+
 assignments solve1Iteration(const formula &instance, const GAConfig & conf)
 {
 	vector<assignments> population;
 	FOR(i, 0, conf.populationSize) population.push_back(randomAssigment(instance.variables));
-	//creates sorted population by number of solved clauses to get the best solution
-	sort(population.begin(), population.end(), [&](const auto &a, const auto &b)
-		{ return getFitness(instance, a) > getFitness(instance, b); });
 
-	assignments best = population.front();
-		 
-	FOR(it, 0, conf.maxIterations)
+	assignments best =  getBestAssignment(instance, population);
+
+	cerr << "it:" << 0 << "," << getAverageFitness(instance, population) << "," << getFitness(instance, best) << '\n';
+	// deb(getAverageFitness(instance, population));
+	// deb(getFitness(instance, best));
+
+	FOR(it, 1, conf.maxIterations)
 	{
 		if(existsSolution(instance, population))
 			break;
@@ -66,11 +75,14 @@ assignments solve1Iteration(const formula &instance, const GAConfig & conf)
 
 		auto newBest = getBestAssignment(instance, population);
 
+		cerr << "it:" << it << "," << getAverageFitness(instance, population) << "," << getFitness(instance, best) << '\n';
+		if(it %20) cerr.flush();
+
 		if(getFitness(instance, newBest) > getFitness(instance, best))
 		{
 			best = newBest;
 			// deb(it);
-			deb(getFitness(instance, best));
+			// deb(getFitness(instance, best));
 		}
 	}
 
